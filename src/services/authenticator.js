@@ -3,6 +3,22 @@ let secret = 'snxhjascnj'
 var jwt = require('jsonwebtoken');
 let timeOut = 2 * 3600 * 1000;
 module.exports = {
+
+    decoder(token) {
+        return new Promise((
+            resolve, reject
+        ) => {
+            jwt.verify(token, secret, function (err, decoded) {
+
+                if (err) {
+                    console.log("[verirication failed]", err)
+                    reject({ err: true, ok: false, msg: "authentication failed" })
+                    return;
+                }
+                resolve(decoded)
+            })
+        })
+    },
     async validateMiddleware(req, res, next) {
         // to do
         /* 
@@ -13,6 +29,7 @@ module.exports = {
         
         */
         try {
+            //use decoder instead
             jwt.verify(req.headers.authorization, secret, function (err, decoded) {
 
                 if (err) {
@@ -25,8 +42,8 @@ module.exports = {
                 next();
 
             })
-        } catch (err) {
-            res.status(401).json({ err: true, ok: false })
+        } catch (error) {
+            res.status(401).json({ err: true, ok: false , error })
         }
     },
 
