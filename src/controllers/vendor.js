@@ -11,7 +11,7 @@ router.post('/vendor/create-product', function (req, res) {
             console.log(err);
             return;
         };
-
+        res.json({err : false})
     })
 })
 router.get("/vendor/categories", getAllCategories)
@@ -94,9 +94,9 @@ router.post("/vendor/service/:id", function (req, res) {
 
 function getAllServices(req, res) {
     if (req.query.active) {
-        stmt = "select * from services  inner join meta_services on meta_services.meta_service_id = services.meta_service_id where services.meta_service_id= ? and services.status = 1";
+        stmt = "select * from services  inner join meta_services on meta_services.meta_service_id = services.meta_service_id where services.meta_service_id= ? and services.status = 1 order by sub_id desc" ;
     } else {
-        stmt = "select * from services  inner join meta_services on meta_services.meta_service_id = services.meta_service_id where services.meta_service_id= ? ";
+        stmt = "select * from services  inner join meta_services on meta_services.meta_service_id = services.meta_service_id where services.meta_service_id= ? order by sub_id desc";
 
     }
     options = [req.params.id]
@@ -113,21 +113,21 @@ function getAllServices(req, res) {
         //         meta_cost : service.meta_cost, 
 
         //     }))
-        res.json({ data: result })
+        res.json({ data: result, id :  result[0].sub_id })
     })
 }
 
 router.get("/vendor/menu/:sub_service_id", getMenu)
 router.post("/vendor/menu/:sub_service_id", function (req, res) {
-    let stmt = "insert into menu (sub_service_id, name, img, cost ) values (? ,? ,?,?) ";
-    let options = [req.params.sub_service_id, req.body.name, req.body.img, req.body.cost];
+    let stmt = "insert into menu (sub_service_id, name__, img, cost, quantity ,meta_service_id) values (? ,? ,?,?,?,?) ";
+    let options = [req.params.sub_service_id, req.body.name__, req.body.img, req.body.cost, req.body.quantity, req.body.meta_service_id];
     con.query(stmt, options, function (err, result) {
         getMenu(req, res)
     })
 
 })
 router.get("/vendor/metamenu/:meta_service_id", function (req, res) {
-    let stmt = "select * from menu where meta_service_id = ?"
+    let stmt = "select distinct name__ from menu where meta_service_id = ?"
     let options = [req.params.meta_service_id];
     con.query(stmt, options, function (err, result) {
         if (err) {
@@ -139,6 +139,7 @@ router.get("/vendor/metamenu/:meta_service_id", function (req, res) {
     })
 
 })
+
 function getMenu(req, res) {
     let stmt = "select * from menu where sub_service_id = ?"
     let options = [req.params.sub_service_id]
@@ -148,7 +149,7 @@ function getMenu(req, res) {
             console.log(err);
             return;
         }
-        res.json({ data: result, id: req.params.sub_service_id })
+        res.json({ data: result })
     })
 }
 

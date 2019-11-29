@@ -3,6 +3,8 @@ var router = express.Router();
 var con = require('../connections/conn')
 
 // import {getAllCategories} from './vendor'
+router.get("/superadmin/requests", getAllRequests)
+
 
 
 router.post("/superadmin/category", function (req, res) {
@@ -19,11 +21,12 @@ router.post("/superadmin/category", function (req, res) {
 
     })
 })
+
 router.post("/superadmin/service_list", function (req, res) {
     let stmt = "insert into service_list (category_id, service_name) values (?,?)"
-    let options = [req.body.category_id,req.body.service_name]
+    let options = [req.body.category_id, req.body.service_name]
     con.query(stmt, options, function (err, result) {
-        console.log("results",result)
+        console.log("results", result)
         if (err) {
             res.json({ err: true, msg: "sql err" })
             console.log(err);
@@ -49,6 +52,18 @@ function getAllCategories(req, res) {
         })
 
         res.json({ data })
+    })
+
+}
+function getAllRequests(req, res) {
+    let stmt = "select * from admin_requests";
+    con.query(stmt, function (err, result) {
+        if (err) {
+            res.json({ err: true, msg: "sql err" })
+            console.log(err);
+            return;
+        }
+        res.json({data : result})
     })
 
 }

@@ -76,5 +76,26 @@ router.post('/admin/login', function (req, res) {
       }
    })
  })
+router.post('/vendor/login', function (req, res) {
+   let stmt = "select * from users where handle= ?  "
+   let toInsert = [req.body.handle]
+   con.query(stmt, toInsert, function (err, result) {
+      if (err) {
+         console.log("[failed the sql query]",err)
+         res.json({ err: true , msg : "sql error"})
+         return;
+      }
+      
+      // console.log("login called ",result[0].password,req.body.password, result)
+      if (!!result[0] && (result[0].password == req.body.password)) {
+         let token = authenticator.createToken({ handle: req.body.handle, user_id : result[0].user_id, user_type : result[0].user_type })
+
+         console.log("login called ")
+         res.json({ err : false,login: true,user_id : result[0].user_id,token, user_name : result[0].user_name })
+      } else {
+         res.json({ err: true, msg: "invalid credentials" })
+      }
+   })
+ })
 
 module.exports = router
