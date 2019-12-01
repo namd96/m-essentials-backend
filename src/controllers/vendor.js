@@ -139,7 +139,19 @@ router.get("/vendor/metamenu/:meta_service_id", function (req, res) {
     })
 
 })
+router.post("/vendor/create-request", function (req, res) {
 
+    let stmt = "insert into admin_requests (user_id,title) values ( ? , ? )";
+    let options = [req.user.user_id, req.body.title]
+    con.query(stmt, options, function (err, result) {
+        if (err) {
+            res.json({ err: true, msg: "sql err" })
+            console.log(err);
+            return;
+        }
+        res.json({ err: false })
+    })
+})
 function getMenu(req, res) {
     let stmt = "select * from menu where sub_service_id = ?"
     let options = [req.params.sub_service_id]
@@ -169,25 +181,25 @@ function getAllCategories(req, res) {
         res.json({ data: result })
     })
 }
-function getAllServiceList(req, res) {
-    let stmt = "select * from service_list inner join categories on service_list.category_id = categories.cat_id where status=1"
-    con.query(stmt, function (err, result) {
-        // var data = [];
-        if (err) {
-            res.json({ err: true, msg: "sql err" })
-            console.log(err);
-            return;
-        }
-        console.log("yesss service")
-        // console.log(result)
-        result = result.map((service) => ({
-            service_name: service.service_name, category_id: service.category_id, cat_name: service.cat_name, service_list_id: service.service_list_id
-        }))
+// function getAllServiceList(req, res) {
+//     let stmt = "select * from service_list inner join categories on service_list.category_id = categories.cat_id where status=1"
+//     con.query(stmt, function (err, result) {
+//         // var data = [];
+//         if (err) {
+//             res.json({ err: true, msg: "sql err" })
+//             console.log(err);
+//             return;
+//         }
+//         console.log("yesss service")
+//         // console.log(result)
+//         result = result.map((service) => ({
+//             service_name: service.service_name, category_id: service.category_id, cat_name: service.cat_name, service_list_id: service.service_list_id
+//         }))
 
-        res.json({ data: result })
-    })
+//         res.json({ data: result })
+//     })
 
-}
+// }
 
 module.exports = router
 // module.exports = getAllCategories

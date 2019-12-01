@@ -47,19 +47,7 @@ router.get('/meta-service/:id', function (req, res) {
     })
 
 })
-router.post("/vendor/create-request", function (req, res) {
 
-    let stmt = "insert into admin_requests (user_id,title, req_type) values ( ? , ? , ?)";
-    let options = [req.user.user_id, req.body.title, req.body.req_type]
-    con.query(stmt, options, function (err, result) {
-        if (err) {
-            res.json({ err: true, msg: "sql err" })
-            console.log(err);
-            return;
-        }
-        res.json({ err: false })
-    })
-})
 router.get('/services/:meta_id', function (req, res) {
     let stmt = "select * from services inner join users on services.vendor_id=users.user_id where meta_service_id = ? order by services.sub_id desc";
     let options = [req.params.meta_id];
